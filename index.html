@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>TicTacToe by Giwang</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      margin: 0;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+    }
+
+    .cell {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .cell:hover {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .winner {
+      animation: winnerFlash 1s infinite alternate;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes winnerFlash {
+      from { background: #ffeb3b; color: #000; }
+      to { background: #ff9800; color: #fff; }
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      animation: fadeInDown 1s ease;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      background: #fff;
+      color: #0072ff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    button:hover {
+      background: #ffeb3b;
+      transform: scale(1.1);
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Game TicTacToe</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Giliran: X</div>
+  <button onclick="resetGame()">Ulangi Permainan</button>
+  <footer>by Giwang</footer>
+
+  <script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+    let currentPlayer = "X";
+    let gameActive = true;
+    let cells = ["", "", "", "", "", "", "", "", ""];
+
+    // Buat kotak
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.dataset.index = i;
+      cell.addEventListener("click", handleCellClick);
+      board.appendChild(cell);
+    }
+
+    function handleCellClick(e) {
+      const index = e.target.dataset.index;
+      if (cells[index] !== "" || !gameActive) return;
+
+      cells[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+
+      if (checkWinner()) {
+        statusText.textContent = `Pemain ${currentPlayer} Menang! 🎉`;
+        gameActive = false;
+        highlightWinner(checkWinner());
+        return;
+      }
+
+      if (!cells.includes("")) {
+        statusText.textContent = "Seri! 🤝";
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      statusText.textContent = `Giliran: ${currentPlayer}`;
+    }
+
+    function checkWinner() {
+      const winningCombos = [
+        [0,1,2],[3,4,5],[6,7,8], // horizontal
+        [0,3,6],[1,4,7],[2,5,8], // vertikal
+        [0,4,8],[2,4,6]           // diagonal
+      ];
+
+      for (let combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+          return combo;
+        }
+      }
+      return null;
+    }
+
+    function highlightWinner(combo) {
+      combo.forEach(index => {
+        document.querySelector(`.cell[data-index="${index}"]`).classList.add("winner");
+      });
+    }
+
+    function resetGame() {
+      cells = ["", "", "", "", "", "", "", "", ""];
+      document.querySelectorAll(".cell").forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove("winner");
+      });
+      currentPlayer = "X";
+      gameActive = true;
+      statusText.textContent = "Giliran: X";
+    }
+  </script>
+</body>
+</html>
